@@ -1,0 +1,229 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connections_slack_name": {
+            "defaultValue": "slack",
+            "type": "String"
+        },
+        "workflows_slacknotify_name": {
+            "defaultValue": "slacknotify",
+            "type": "String"
+        },
+        "serverfarms_SlackLogicAppsPlan_name": {
+            "defaultValue": "SlackLogicAppsPlan",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Logic/workflows/slacknotify'.",
+            "type": "Microsoft.Logic/workflows",
+            "name": "[parameters('workflows_slacknotify_name')]",
+            "apiVersion": "2017-07-01",
+            "location": "westeurope",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "context": {
+                                                    "properties": {
+                                                        "activityLog": {
+                                                            "properties": {
+                                                                "authorization": {
+                                                                    "properties": {
+                                                                        "action": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "scope": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                },
+                                                                "caller": {
+                                                                    "type": "string"
+                                                                },
+                                                                "channels": {
+                                                                    "type": "string"
+                                                                },
+                                                                "claims": {
+                                                                    "type": "string"
+                                                                },
+                                                                "correlationId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string"
+                                                                },
+                                                                "eventDataId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "eventSource": {
+                                                                    "type": "string"
+                                                                },
+                                                                "eventTimestamp": {
+                                                                    "type": "string"
+                                                                },
+                                                                "httpRequest": {
+                                                                    "type": "string"
+                                                                },
+                                                                "level": {
+                                                                    "type": "string"
+                                                                },
+                                                                "operationId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "operationName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "resourceGroupName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "resourceId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "resourceProviderName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "resourceType": {
+                                                                    "type": "string"
+                                                                },
+                                                                "status": {
+                                                                    "type": "string"
+                                                                },
+                                                                "subStatus": {
+                                                                    "type": "string"
+                                                                },
+                                                                "submissionTimestamp": {
+                                                                    "type": "string"
+                                                                },
+                                                                "subscriptionId": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "properties": {
+                                                    "properties": {},
+                                                    "type": "object"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "schemaId": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Post_message": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['slack']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/chat.postMessage",
+                                "queries": {
+                                    "channel": "CCPPJFRCK",
+                                    "text": "VM created in Resource Group:  @{triggerBody()?['data']?['context']?['activityLog']?['resourceGroupName']} Running Status:@{triggerBody()?['data']?['context']?['activityLog']?['status']}  VM Name:@{\n\n\nsubstring(string(triggerBody()?['data']?['context']?['activityLog']?['resourceId']),add(lastIndexOf(string(triggerBody()?['data']?['context']?['activityLog']?['resourceId']),'/'),1),6)}"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "slack": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_slack_name'))]",
+                                "connectionName": "slack",
+                                "id": "/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/providers/Microsoft.Web/locations/westeurope/managedApis/slack"
+                            }
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', parameters('connections_slack_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Web/connections/slack'.",
+            "type": "Microsoft.Web/connections",
+            "name": "[parameters('connections_slack_name')]",
+            "apiVersion": "2016-06-01",
+            "location": "westeurope",
+            "scale": null,
+            "properties": {
+                "displayName": "romeel_k",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_slack_name'))]"
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Web/serverfarms/SlackLogicAppsPlan'.",
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "app",
+            "name": "[parameters('serverfarms_SlackLogicAppsPlan_name')]",
+            "apiVersion": "2016-09-01",
+            "location": "West Europe",
+            "scale": null,
+            "properties": {
+                "name": "[parameters('serverfarms_SlackLogicAppsPlan_name')]",
+                "workerTierName": null,
+                "adminSiteName": null,
+                "hostingEnvironmentProfile": null,
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            },
+            "dependsOn": []
+        }
+    ]
+}
