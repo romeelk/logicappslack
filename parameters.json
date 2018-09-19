@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "connections_slack_name": {
-            "value": null
+            "value": "slack"
         },
         "workflows_slacknotify_name": {
-            "value": null
+            "value": "slacknotify"
         },
         "serverfarms_SlackLogicAppsPlan_name": {
-            "value": null
+            "value": "SlackLogicAppsPlan"
         }
     }
 }
