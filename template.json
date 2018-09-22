@@ -54,6 +54,14 @@
             "metadata": {
                 "description": "Location for all resources."
             }
+        },
+        "actionGroups_startvm_name": {
+            "defaultValue": "startvm",
+            "type": "String"
+        }, 
+        "activityLogAlerts_startvm_name": {
+            "defaultValue": "startvm",
+            "type": "String"
         }
     },
     "variables": {
@@ -65,7 +73,8 @@
         "publicIPAddressName": "msworkshopPublicIp",
         "vmName": "msworkshopVM",
         "virtualNetworkName": "msworkshopVnet",
-        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
+        "actionGroups_startvm_resourceId" : "[resourceId('Microsoft.Logic/workflows/', parameters('workflows_slacknotify_name'))]"
     },
     "resources": [
         {
@@ -89,6 +98,9 @@
               "dnsSettings": {
                 "domainNameLabel": "[parameters('dnsLabelPrefix')]"
               }
+            },
+            "tags": {
+                "Environment": "Development"
             }
         },
         {
@@ -110,6 +122,9 @@
                   }
                 }
               ]
+            },
+            "tags": {
+                "Environment": "Development"
             }
         },
         {
@@ -136,6 +151,9 @@
                   }
                 }
               ]
+            },
+            "tags": {
+                "Environment": "Development"
             }
         },
         {
@@ -187,6 +205,9 @@
                   "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob]"
                 }
               }
+            },
+            "tags": {
+                "Environment": "Development"
             }      
         },
         {
@@ -195,7 +216,9 @@
             "name": "[parameters('workflows_slacknotify_name')]",
             "apiVersion": "2017-07-01",
             "location": "westeurope",
-            "tags": {},
+            "tags": {
+                "Environment": "Development"
+            },
             "scale": null,
             "properties": {
                 "state": "Enabled",
@@ -368,7 +391,10 @@
                     "id": "[concat('/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_slack_name'))]"
                 }
             },
-            "dependsOn": []
+            "dependsOn": [],
+            "tags": {
+                "Environment": "Development"
+            }
         },
         {
             "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Web/serverfarms/SlackLogicAppsPlan'.",
@@ -395,7 +421,83 @@
                 "targetWorkerCount": 0,
                 "targetWorkerSizeId": 0
             },
+            "dependsOn": [],
+            "tags": {
+                "Environment": "Development"
+            }
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/examdevboxrg/providers/microsoft.insights/actionGroups/startvm'.",
+            "type": "microsoft.insights/actionGroups",
+            "name": "[parameters('actionGroups_startvm_name')]",
+            "apiVersion": "2018-03-01",
+            "location": "Global",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "groupShortName": "[parameters('actionGroups_startvm_name')]",
+                "enabled": true,
+                "emailReceivers": [],
+                "smsReceivers": [],
+                "webhookReceivers": [],
+                "itsmReceivers": [],
+                "azureAppPushReceivers": [],
+                "automationRunbookReceivers": [],
+                "voiceReceivers": [],
+                "logicAppReceivers": [
+                    {
+                        "name": "start",
+                        "resourceId": "[variables('actionGroups_startvm_resourceId')]",
+                        "callbackUrl": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('workflows_slacknotify_name')), '/triggers/manual'), '2016-06-01').value]"
+                   }
+                ],
+                "azureFunctionReceivers": []
+            },
             "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/ExamDevBoxRg/providers/microsoft.insights/activityLogAlerts/startvm'.",
+            "type": "microsoft.insights/activityLogAlerts",
+            "name": "[parameters('activityLogAlerts_startvm_name')]",
+            "apiVersion": "2017-04-01",
+            "location": "Global",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [
+                        {
+                            "field": "category",
+                            "equals": "Administrative"
+                        },
+                        {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+                        },
+                        {
+                            "field": "operationName",
+                            "equals": "Microsoft.Compute/virtualMachines/start/action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [
+                        {
+                            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_startvm_name'))]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_startvm_name')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
+                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroups_startvm_name'))]"
+            ]
         }
         
     ],
@@ -403,6 +505,6 @@
         "WebHookURI": {
           "type": "string",
           "value": "[listCallbackURL(concat(resourceId('Microsoft.Logic/workflows/', parameters('workflows_slacknotify_name')), '/triggers/manual'), '2016-06-01').value]"
-        }
+        }     
     }
 }
