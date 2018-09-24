@@ -211,7 +211,7 @@
             }      
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Logic/workflows/slacknotify'.",
+            "comments": "LogicApp workflow",
             "type": "Microsoft.Logic/workflows",
             "name": "[parameters('workflows_slacknotify_name')]",
             "apiVersion": "2017-07-01",
@@ -368,7 +368,7 @@
                             "slack": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_slack_name'))]",
                                 "connectionName": "slack",
-                                "id": "/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/providers/Microsoft.Web/locations/westeurope/managedApis/slack"
+                                "id": "[concat('/subscriptions/','subscription().subscriptionId','/providers/Microsoft.Web/locations/westeurope/managedApis/slack')]"
                             }
                         }
                     }
@@ -379,7 +379,7 @@
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Web/connections/slack'.",
+            "comments": "Connection to Slack",
             "type": "Microsoft.Web/connections",
             "name": "[parameters('connections_slack_name')]",
             "apiVersion": "2016-06-01",
@@ -389,7 +389,7 @@
                 "displayName": "romeel_k",
                 "customParameterValues": {},
                 "api": {
-                    "id": "[concat('/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_slack_name'))]"
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_slack_name'))]"
                 }
             },
             "dependsOn": [],
@@ -398,7 +398,7 @@
             }
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/workshop-slack-demo-rg/providers/Microsoft.Web/serverfarms/SlackLogicAppsPlan'.",
+            "comments": "App service plan to host Logic App",
             "type": "Microsoft.Web/serverfarms",
             "sku": {
                 "name": "S1",
@@ -428,7 +428,7 @@
             }
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/80c301f8-0098-4963-8ef1-f53ae4a61749/resourceGroups/examdevboxrg/providers/microsoft.insights/actionGroups/startvm'.",
+            "comments": "VM action group for alert notification",
             "type": "microsoft.insights/actionGroups",
             "name": "[parameters('actionGroups_startvm_name')]",
             "apiVersion": "2018-03-01",
