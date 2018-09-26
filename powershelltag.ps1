@@ -7,10 +7,10 @@ $publicIpName = "rackspacemsworkshop"
 $dnsPrefix = "rackspacemsworkshopdemo"
 $storageaccountName = "rackspacedemostorage"
 $storageAccountNum = (1,2,3,4)
+
 # Create resource group and a storage account
 New-AzureRmResourceGroup -Name $resourceGroupName -Location $location
 Write-Host "Creating Resource Group -->" $resourceGroupName -ForegroundColor Green
-
 
 foreach ($item in $storageAccountNum) {
     $name = $storageaccountName+$item
@@ -31,7 +31,7 @@ $virtualNetwork = New-AzureRmVirtualNetwork `
   -Tag $tag `
   -Subnet $subnet
 
-  Write-Host "Creating vnet -->" $vnetName -ForegroundColor Green
+Write-Host "Creating vnet -->" $vnetName -ForegroundColor Green
 $virtualNetwork | Set-AzureRmVirtualNetwork
 
 $publicIp = New-AzureRmPublicIpAddress -AllocationMethod Static -Name $publicIpName -ResourceGroupName $resourceGroupName -DomainNameLabel $dnsPrefix -Location $location -Tag $tag
