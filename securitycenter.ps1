@@ -1,8 +1,31 @@
 
-$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-$headers.Add('Authorization','Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Imk2bEdrM0ZaenhSY1ViMkMzbkVRN3N5SEpsWSIsImtpZCI6Imk2bEdrM0ZaenhSY1ViMkMzbkVRN3N5SEpsWSJ9.eyJhdWQiOiJodHRwczovL21hbmFnZW1lbnQuY29yZS53aW5kb3dzLm5ldCIsImlzcyI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0LzU3MDA1N2Y0LTczZWYtNDFjOC1iY2JiLTA4ZGIyZmMxNWMyYi8iLCJpYXQiOjE1MzgwNTA1NzAsIm5iZiI6MTUzODA1MDU3MCwiZXhwIjoxNTM4MDU0NDcwLCJhaW8iOiI0MkJnWUZpYzFYYTRuVmxVTFdENW41YkZGY3pOQUE9PSIsImFwcGlkIjoiZjc0ZmIzZjAtMGM5Zi00MTBhLWIwZTAtZDRlNTU2MjY1NjcyIiwiYXBwaWRhY3IiOiIxIiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvNTcwMDU3ZjQtNzNlZi00MWM4LWJjYmItMDhkYjJmYzE1YzJiLyIsIm9pZCI6IjBhYzhiMjdmLTFhNTctNDdiMC1hYWZiLTc0NTA1ZTFiMmMyMiIsInN1YiI6IjBhYzhiMjdmLTFhNTctNDdiMC1hYWZiLTc0NTA1ZTFiMmMyMiIsInRpZCI6IjU3MDA1N2Y0LTczZWYtNDFjOC1iY2JiLTA4ZGIyZmMxNWMyYiIsInV0aSI6Ild4VG9kTUFGLUVDN3VuUE40QmdrQVEiLCJ2ZXIiOiIxLjAifQ.eFfo1fWWQxW0dLVEzWyOx-dX4bZwecd7s-2Gs10Rx6Fu2T7wjLmVMrAkPhg0qs-vUTAKXkdHmLhk_1Z4A2crXf5fhvt5IOkpcYRjgCDbqwMKsYGcurSO9s9t7mfMRoczMaeyS31vcWC9sPOOckFji2e5x7_3LJtKIpcGsD9Q4sKaDhyfyyla21ZickrHaiE1j7FoGQMMbdnRabTGwAhB0TWVV9SDiHAfy4sfC8DTaVCcm5dZBph98HpWjmS2C3T1xjEaN6_yqQfVU2AH9eQVsNTrQVfsHKmHU16uFaPJ4evgKe1_XBmXZnXapSPAEcia74x6HD0LPpAWb-oVu1dVQg')
+$authUrl = "https://login.microsoftonline.com/570057f4-73ef-41c8-bcbb-08db2fc15c2b/oauth2/token"
+$postParams = @{grant_type='client_credentials';client_id='f74fb3f0-0c9f-410a-b0e0-d4e556265672';
+client_secret='pHvbMYQDXib7Evj/7h0qZeSG6ROwqWzDKTsJVM02GM4=';resource='https://management.core.windows.net'}
 
-Invoke-WebRequest `
+$response = Invoke-WebRequest `
+-Uri  $authUrl `
+-Headers $headers `
+-Method "Post" `
+-Body $postParams
+
+$authObject = ConvertFrom-Json -InputObject $response.Content
+
+$bearerToken = "Bearer " + $authObject.access_token
+
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add('Authorization',$bearerToken)
+
+$securityApiRespones = Invoke-WebRequest `
 -Uri  'https://management.azure.com/subscriptions/b4b92210-d397-4db6-9606-f19cfc40fda5/providers/Microsoft.Security/tasks?api-version=2015-06-01-preview' `
 -Headers $headers `
 -Method "Get"
+
+$jsonString = ConvertFrom-Json -InputObject $securityApiRespones.Content
+
+Write-Host "The following Security Center recommendations were found:" -ForegroundColor Yellow
+foreach($compliance in $jsonString.value)
+{
+    $vmName = $(if($null -eq $compliance.properties.securityTaskParameters.vmName ) {"N/A"} Else{$compliance.properties.securityTaskParameters.vmName})
+    Write-Host "VmName: $vmName Recommendation:" $compliance.properties.securityTaskParameters.name -ForegroundColor Green
+}
