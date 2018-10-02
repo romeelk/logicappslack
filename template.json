@@ -215,7 +215,7 @@
             "type": "Microsoft.Logic/workflows",
             "name": "[parameters('workflows_slacknotify_name')]",
             "apiVersion": "2017-07-01",
-            "location": "westeurope",
+            "location": "northeurope",
             "tags": {
                 "Environment": "Development"
             },
@@ -368,7 +368,7 @@
                             "slack": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections_slack_name'))]",
                                 "connectionName": "slack",
-                                "id": "[concat('/subscriptions/','subscription().subscriptionId','/providers/Microsoft.Web/locations/westeurope/managedApis/slack')]"
+                                "id": "[concat('/subscriptions/','subscription().subscriptionId','/providers/Microsoft.Web/locations/northeurope/managedApis/slack')]"
                             }
                         }
                     }
@@ -383,13 +383,13 @@
             "type": "Microsoft.Web/connections",
             "name": "[parameters('connections_slack_name')]",
             "apiVersion": "2016-06-01",
-            "location": "westeurope",
+            "location": "northeurope",
             "scale": null,
             "properties": {
                 "displayName": "romeel_k",
                 "customParameterValues": {},
                 "api": {
-                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/westeurope/managedApis/', parameters('connections_slack_name'))]"
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/northeurope/managedApis/', parameters('connections_slack_name'))]"
                 }
             },
             "dependsOn": [],
@@ -410,7 +410,7 @@
             "kind": "app",
             "name": "[parameters('serverfarms_SlackLogicAppsPlan_name')]",
             "apiVersion": "2016-09-01",
-            "location": "West Europe",
+            "location": "[parameters('location')]",
             "scale": null,
             "properties": {
                 "name": "[parameters('serverfarms_SlackLogicAppsPlan_name')]",
