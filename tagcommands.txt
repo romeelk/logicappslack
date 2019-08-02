@@ -1,0 +1,5 @@
+Get-AzureRMResource 
+Get-AzureRmResource –Tag @{"msworkshop"="demo"}
+Set-AzureRmResource -ResourceType "Microsoft.Storage/storageAccounts" -Name ”rackspacedemostorage1" -Tags @{"msworkshop"="demo” } -ResourceGroupName "ms-workshop-posh-demo”
+Get-AzureRmResource -Tag @{"msworkshop"="demo"}
+
